@@ -30,6 +30,16 @@ Generate resampled corpuses using a given fold indices and save them under the d
 
 @param dirpath: a string containing the path to the parent directory for the resampled corpuses to be saved.
 
+**Implementation**
+
+Helper functions:
+
+1. complement(full, sub): Given a full 1D list or array and a subset of said list, return the complement.
+
+2. write_corpus(strings, fullpath): Write a list (or numpy array) of strings into a corpus file from a user supplied filepath. 
+
+Use complement() to generate out of fold index. Use numpy index array access and write_corpus() to write in fold and out of fold corpuses. 
+ 
 -----
 
 ### eval(ranker, queries, corpus)

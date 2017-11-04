@@ -1,4 +1,4 @@
-import numpy
+from base_helpers import *
 
 
 # Return a 2D array composed of randomly sampled lists of index.
@@ -21,42 +21,9 @@ def sample(index_data, n, k = 1, replace = False):
 
     result = numpy.zeros((k, n))
     for i in range(k):
-        result[i, 0:n] = numpy.random.choice(index_data, n, replace)
+        result[i, 0:n] = numpy.sort(numpy.random.choice(index_data, n, replace))
 
     return result
-
-
-# Helper function. Read corpus into a numpy array of strings from a user supplied filepath.
-def read_corpus(fullpath):
-    corpus = open(fullpath, 'r')
-    line = corpus.readline()
-    # Store into regular list first to take advantage of dynamic resizing.
-    temp = []
-
-    while line:
-        temp.append(line)
-        line = corpus.readline()
-
-    # Convert to numpy array to allow list index access.
-    result = numpy.array(temp)
-
-    return result
-
-
-# Helper function. Write a list (or numpy array) of strings into a corpus file from a user supplied filepath
-def write_corpus(strings, fullpath):
-    corpus = open(fullpath, 'w')
-    for string in strings:
-        corpus.write(string)
-
-
-# Helper function. Given a full 1D list or array and a subset of said list, return the complement.
-def complement(full, sub):
-    # Convert to sets first.
-    fullset = set(full)
-    subset = set(sub)
-
-    return(fullset - subset)
 
 
 # Generate resampled corpuses using a given fold indices and save them under the directory specified by user.
@@ -73,4 +40,5 @@ def gen_folds(corpus, folds, dirpath):
         # Generate each inFold corpus and outFold corpus
         inFold = corpus[folds[i,:]]
         outFold = corpus[complement(full_index, folds[i,:])]
+        # TODO: caching corpuses on disk
         # TODO: query mapping
