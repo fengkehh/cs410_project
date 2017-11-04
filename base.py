@@ -30,6 +30,8 @@ def sample(index_data, n, k = 1, replace = False):
 #
 # @param corpus: A numpy array of strings containing all documents in the full corpus.
 #
+# @param full_config: full configuration file in an OrderedDict
+#
 # @param folds: A k x n 2D numpy array containing indices of the documents inside each fold.
 #
 # @param dirpath: a string containing the path to the parent directory for the resampled corpuses to be saved.
