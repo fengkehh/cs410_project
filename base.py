@@ -35,6 +35,7 @@ def read_corpus(fullpath):
 
     while line:
         temp.append(line)
+        line = corpus.readline()
 
     # Convert to numpy array to allow list index access.
     result = numpy.array(temp)
@@ -51,4 +52,4 @@ def write_corpus(strings, fullpath):
 
 test = read_corpus('./cranfield/cranfield.dat')
 
-print(test[0])
+print(test[1000])
