@@ -1,4 +1,4 @@
-### sample(index_data, n, replace = False)
+### sample(index_data, n, k=1, replace = False)
 
 Return a 2D array composed of randomly sampled lists of index.
 
@@ -16,20 +16,22 @@ index_data.size() instead)
 
 **Implementation**
 
-Wrapper for [numpy.random.choice()](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.random.choice.html)
+Wrapper for [numpy.random.choice()](https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.random.choice.html).
 
 -----
-### genSamples(corpus, folds, pathname)
 
-Split a given corpus of text into folds (both infold and outfold) and save each fold into subfolders specified by pathname as a resampled corpus
+### gen_folds(corpus, folds, dirpath)
 
-@param corpus: a string representing the path to the file containing the full corpus to be resampled
+Generate resampled corpuses using a given fold indices and save them under the directory specified by user.
 
-@param folds: a list of list of docIDs, each sublist contains docIDs in that particular fold. If there are k resamples, then folds will be a list of k elements, each element being a list of the docIDs in the fold of that resample.
+@param corpus: A numpy array of strings containing all documents in the full corpus.
 
-@param pathname: a string representing the path to the directory that will contain the resampled corpuses
+@param folds: A k x n 2D numpy array containing indices of the documents inside each fold.
+
+@param dirpath: a string containing the path to the parent directory for the resampled corpuses to be saved.
 
 -----
+
 ### eval(ranker, queries, corpus)
 
 Return a list of evaluation scores of the retrieved documents from the given corpus using a given list of queries

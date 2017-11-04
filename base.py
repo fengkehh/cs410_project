@@ -50,6 +50,27 @@ def write_corpus(strings, fullpath):
         corpus.write(string)
 
 
-test = read_corpus('./cranfield/cranfield.dat')
+# Helper function. Given a full 1D list or array and a subset of said list, return the complement.
+def complement(full, sub):
+    # Convert to sets first.
+    fullset = set(full)
+    subset = set(sub)
 
-print(test[1000])
+    return(fullset - subset)
+
+
+# Generate resampled corpuses using a given fold indices and save them under the directory specified by user.
+#
+# @param corpus: A numpy array of strings containing all documents in the full corpus.
+#
+# @param folds: A k x n 2D numpy array containing indices of the documents inside each fold.
+#
+# @param dirpath: a string containing the path to the parent directory for the resampled corpuses to be saved.
+def gen_folds(corpus, folds, dirpath):
+    (k,n) = folds.shape
+    full_index = range(len(corpus)) # list containing the full index of the corpus
+    for i in range(k):
+        # Generate each inFold corpus and outFold corpus
+        inFold = corpus[folds[i,:]]
+        outFold = corpus[complement(full_index, folds[i,:])]
+        # TODO: query mapping
