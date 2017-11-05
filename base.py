@@ -44,3 +44,4 @@ def gen_folds(corpus, folds, dirpath):
         outFold = corpus[complement(full_index, folds[i,:])]
         # TODO: caching corpuses on disk
         # TODO: query mapping
+        # TODO: config generation
