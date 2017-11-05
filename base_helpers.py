@@ -1,5 +1,17 @@
 import numpy
 from collections import OrderedDict
+from os import *
+
+
+# Helper function. Given a fullpath and mode, open this file for read or write. If it's write mode and directory doesn't
+# exist, create it. Return the opened file.
+def file_open(fullpath, mode):
+    dirpath = path.dirname(fullpath)
+    if mode.find('w') >= 0: # write mode
+        if not path.exists(dirpath): # directory doesn't exist, create.
+            makedirs(dirpath)
+
+    return open(fullpath, mode)
 
 
 # Helper function. Given a full 1D list or array and a subset of said list, return the complement.
@@ -13,7 +25,7 @@ def complement(full, sub):
 
 # Helper function. Read corpus into a numpy array of strings from a user supplied filepath.
 def read_corpus(fullpath):
-    corpus = open(fullpath, 'r')
+    corpus = file_open(fullpath, 'r')
     line = corpus.readline()
     # Store into regular list first to take advantage of dynamic resizing.
     temp = []
@@ -31,7 +43,7 @@ def read_corpus(fullpath):
 
 # Helper function. Write a list (or numpy array) of strings into a corpus file from a user supplied filepath
 def write_corpus(strings, fullpath):
-    corpus = open(fullpath, 'w')
+    corpus = file_open(fullpath, 'w')
     for string in strings:
         corpus.write(string)
 
@@ -41,7 +53,7 @@ def write_corpus(strings, fullpath):
 # Helper function. Given a full path to a toml config file, parse settings and store them in an OrderedDict.
 def parse_config(fullpath):
     result = OrderedDict()
-    config = open(fullpath, 'r')
+    config = file_open(fullpath, 'r')
     line = config.readline()
     while line:
         tokens = line.split('=')
@@ -61,7 +73,7 @@ def parse_config(fullpath):
 # Helper function. Given an OrderedDict with keys = config keys, values = config settings, write to a toml config file
 # as specified by the user.
 def write_config(configs, fullpath):
-    file = open(fullpath, 'w')
+    file = file_open(fullpath, 'w')
 
     for key in configs.keys():
         setting = configs[key]
@@ -90,12 +102,9 @@ def dict_insert(container, key, value):
 # path to a directory, save the resampled and reordered docIDs in a new query relevance file in the directory. Save the
 # query docID mapping in the format of "original,new" (minus the quotes) in a mapping file in the directory.
 def qrel_mapper(qrel_path, fold, targetdir):
-    qrel = open(qrel_path, 'r')
-    qmap = open(targetdir + 'qmap.txt', 'w')
-    qrels_samp = open(targetdir + 'qrels-sampled.txt', 'w')
-
     # parse for the original relevance labels and store them in temp storage.
     # temp storage to store original relevance labels.
+    qrel = file_open(qrel_path, 'r')
     orig_rel = dict()
     qrel_line = qrel.readline()
     while not qrel_line:
@@ -108,6 +117,7 @@ def qrel_mapper(qrel_path, fold, targetdir):
     # Write out docID mapping for the query relevance file
     # Format: original,new on each line for docIDs in the sampled fold
     # temp storage for resampled relevance
+    qmap = file_open(targetdir + 'qmap.txt', 'w')
     temp = dict()
     for i in range(len(fold)):
         docID_orig = fold[i]
@@ -121,8 +131,9 @@ def qrel_mapper(qrel_path, fold, targetdir):
     qmap.close()
 
     # Write the sampled qrel file with new docIDs.
-    sorted_qIDs = sorted(temp.keys())
-    for qID in sorted_qIDs:
+    qrels_samp = file_open(targetdir + 'qrels-sampled.txt', 'w')
+    sorted_qids = sorted(temp.keys())
+    for qID in sorted_qids:
         rsamp_line = qID
         for tuple in temp[qID]:
             rsamp_line = rsamp_line + ' ' + tuple[0] + ' ' + tuple[1] + '\n'

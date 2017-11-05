@@ -28,20 +28,36 @@ def sample(index_data, n, k = 1, replace = False):
 
 # Generate resampled corpuses using a given fold indices and save them under the directory specified by user.
 #
-# @param corpus: A numpy array of strings containing all documents in the full corpus.
+# @param config_path: a string pointing to the config file of the original corpus
 #
 # @param full_config: full configuration file in an OrderedDict
 #
 # @param folds: A k x n 2D numpy array containing indices of the documents inside each fold.
 #
 # @param dirpath: a string containing the path to the parent directory for the resampled corpuses to be saved.
-def gen_folds(corpus, folds, dirpath):
-    (k,n) = folds.shape
+def gen_folds(config_path, folds, dirpath):
+    # Parse original config
+    orig_config = parse_config(config_path)
+    set_name = orig_config['dataset']
+    orig_data_dir = './' + set_name + '/'
+    orig_corpus_path = orig_data_dir + set_name + '.dat'
+    corpus = read_corpus(orig_corpus_path)
+
     full_index = range(len(corpus)) # list containing the full index of the corpus
+    (k, n) = folds.shape
     for i in range(k):
         # Generate each inFold corpus and outFold corpus
-        inFold = corpus[folds[i,:]]
-        outFold = corpus[complement(full_index, folds[i,:])]
-        # TODO: caching corpuses on disk
-        # TODO: query mapping
+        infold_index = folds[i,:]
+        outfold_index = complement(full_index, infold_index)
+        infold_corpus = corpus[infold_index]
+        outfold_corpus = corpus[outfold_index]
+        # Caching corpuses on disk
+        infold_dirpath = dirpath + '/fold' + str(i) + '/in/'
+        outfold_dirpath = dirpath + '/fold' + str(i) + '/out/'
+        write_corpus(infold_corpus, infold_dirpath + 'in.dat')
+        write_corpus(outfold_corpus, outfold_dirpath + 'out.dat')
+        # Query mapping
+        full_qrel_path = orig_data_dir + set_name + '-qrels.txt'
+        qrel_mapper(full_qrel_path, infold_index, infold_dirpath)
+        qrel_mapper(full_qrel_path, outfold_index, outfold_dirpath)
         # TODO: config generation
