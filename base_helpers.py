@@ -16,7 +16,7 @@ def file_open(fullpath, mode):
 
 # Helper function. Given a full 1D list or array and a subset of said list, return the complement.
 def complement(full, sub):
-    # Convert to sets first.
+    # Convert to sets first. TODO: might need to use ordered set!
     fullset = set(full)
     subset = set(sub)
 
