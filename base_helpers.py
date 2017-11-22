@@ -89,8 +89,8 @@ def write_config(configs, fullpath):
     file.close()
 
 
-# Helper function. Insert a key to a dict or OrderedDict and value. If key already exists, append value to the existing
-# value.
+# Helper function. Insert a key to a dict or OrderedDict and set value in a list. If key already exists, append value
+# to the existing value.
 def dict_insert(container, key, value):
     if key not in container:
         container[key] = [value]

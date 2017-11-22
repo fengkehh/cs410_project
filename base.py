@@ -1,4 +1,5 @@
 from base_helpers import *
+from shutil import copy2
 
 
 # Return a 2D array composed of randomly sampled lists of index.
@@ -33,13 +34,11 @@ def sample(index_data, n, k = 1, replace = False):
 # @param full_config: full configuration file in an OrderedDict
 #
 # @param folds: A k x n 2D numpy array containing indices of the documents inside each fold.
-#
-# @param dirpath: a string containing the path to the parent directory for the resampled corpuses to be saved.
-def gen_folds(config_path, folds, dirpath):
+def gen_folds(config_path, folds):
     # Parse original config
     orig_config = parse_config(config_path)
     set_name = orig_config['dataset']
-    orig_data_dir = './' + set_name + '/'
+    orig_data_dir = orig_config['prefix'] + '/' + set_name + '/' # dir path to dataset.dat
     orig_corpus_path = orig_data_dir + set_name + '.dat'
     corpus = read_corpus(orig_corpus_path)
 
@@ -52,12 +51,28 @@ def gen_folds(config_path, folds, dirpath):
         infold_corpus = corpus[infold_index]
         outfold_corpus = corpus[outfold_index]
         # Caching corpuses on disk
-        infold_dirpath = dirpath + '/fold' + str(i) + '/in/'
-        outfold_dirpath = dirpath + '/fold' + str(i) + '/out/'
+        fold_dir = orig_data_dir + 'fold_' + str(i) + '/' # dir path to each fold
+        infold_dirpath = fold_dir + 'in/' # in fold dir path
+        outfold_dirpath = fold_dir + 'out/' # out fold dir path
         write_corpus(infold_corpus, infold_dirpath + 'in.dat')
         write_corpus(outfold_corpus, outfold_dirpath + 'out.dat')
-        # Query mapping
-        full_qrel_path = orig_data_dir + set_name + '-qrels.txt'
+        # Judgement mapping
+        full_qrel_path = orig_config['query-judgements'] # path to the original query judgment
         qrel_mapper(full_qrel_path, infold_index, infold_dirpath)
         qrel_mapper(full_qrel_path, outfold_index, outfold_dirpath)
-        # TODO: config generation
+        # TODO: config generation - config to be saved under orig_data_dir/fold_i/
+        stopwords_path = os.path.abspath(orig_config['stop-words'])  # abs path for stopwords file
+        # in-fold (training) config
+        in_config = orig_config
+        in_config['prefix'] = fold_dir # config to be saved under "orig_data_dir/fold_i/"
+        in_config['stop-words'] = stopwords_path  # setting stopwords file path & name
+        in_config['dataset'] = 'in'
+        in_config['query-judgements'] = infold_dirpath + 'qrels-sampled.txt' # setting judgement file path & name
+        write_config(in_config, fold_dir + 'in_fold.toml') # write configuration file
+        copy2(orig_data_dir + orig_config['query-path'], infold_dirpath) # copy query file over
+        # out-fold (testing)
+        out_config = in_config
+        out_config['dataset'] = 'out'
+        out_config['query-judgements'] = outfold_dirpath + 'qrels-sampled.txt'
+        write_config(in_config, fold_dir + 'out_fold.toml')
+        copy2(orig_data_dir + orig_config['query-path'], outfold_dirpath)
