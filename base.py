@@ -83,7 +83,7 @@ def gen_folds(config_path, folds):
         qrel_mapper(full_qrel_path, outfold_index, outfold_dirpath)
         # Config generation - config to be saved under orig_data_dir/fold_i/
         stopwords_path = os.path.abspath(orig_config['stop-words'])  # abs path for stopwords file
-        # in-fold (training) config
+        # in-fold (testing) config
         in_config = orig_config
         in_config['prefix'] = fold_dir # config to be saved under "orig_data_dir/fold_i/"
         in_config['stop-words'] = stopwords_path  # setting stopwords file path & name
@@ -91,7 +91,7 @@ def gen_folds(config_path, folds):
         in_config['query-judgements'] = infold_dirpath + 'qrels-sampled.txt' # setting judgement file path & name
         write_config(in_config, fold_dir + 'in_fold.toml') # write configuration file
         copy2(orig_data_dir + orig_config['query-path'], infold_dirpath) # copy query file over
-        # out-fold (testing)
+        # out-fold (training)
         out_config = in_config
         out_config['dataset'] = 'out'
         out_config['query-judgements'] = outfold_dirpath + 'qrels-sampled.txt'
