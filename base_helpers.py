@@ -107,11 +107,13 @@ def qrel_mapper(qrel_path, fold, targetdir):
     qrel = file_open(qrel_path, 'r')
     orig_rel = dict()
     qrel_line = qrel.readline()
+
     while not qrel_line:
         tokens = qrel_line.split()
         # Format: key = original docID, value = list [tuple (qID, relevance)]
         dict_insert(orig_rel,key=tokens[1], value=(tokens[0],tokens[2]))
         qrel_line = qrel.readline()
+
     qrel.close()
 
     # Write out docID mapping for the query relevance file
@@ -119,6 +121,7 @@ def qrel_mapper(qrel_path, fold, targetdir):
     # temp storage for resampled relevance
     qmap = file_open(targetdir + 'qmap.txt', 'w')
     temp = dict()
+
     for i in range(len(fold)):
         docID_orig = fold[i]
         qmap_line = str(docID_orig) + ',' + str(i) + '\n'
@@ -126,16 +129,21 @@ def qrel_mapper(qrel_path, fold, targetdir):
         # Also put relevance into temp storage for resampled docs. Format: key = qID,
         # value = list of [tuple (new docID, rel)]
         doc_rel = orig_rel[docID_orig]
+
         for tuple in doc_rel:
             dict_insert(temp,key=tuple[0],value=(str(i),tuple[1]))
+
     qmap.close()
 
     # Write the sampled qrel file with new docIDs.
     qrels_samp = file_open(targetdir + 'qrels-sampled.txt', 'w')
     sorted_qids = sorted(temp.keys())
+
     for qID in sorted_qids:
         rsamp_line = qID
+
         for tuple in temp[qID]:
             rsamp_line = rsamp_line + ' ' + tuple[0] + ' ' + tuple[1] + '\n'
         qrels_samp.write(rsamp_line)
+
     qrels_samp.close()

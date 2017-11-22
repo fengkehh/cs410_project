@@ -1,30 +1,50 @@
 from base_helpers import *
 from shutil import copy2
+from math import floor
 
 
-# Return a 2D array composed of randomly sampled lists of index.
+# Return a numpy array composed of randomly sampled lists of index.
 #
 # @param index_data: A full list of index of the ordered, iterable object.
 #
-# @param n: a positive integer indicating the number of documents to be sampled from the full list. If n <= 0 sample the
+# @param n: a positive integer indicating the number of documents to be sampled from the full list. If n <= 0
+# sample the
 # full index
-#
-# @param k: the number of times sampling should be done. Each sampled list of index is stored on a separate ROW of
-# the resulting 2D array.
 #
 # @param replace: boolean indicating whether sample uses replacement. if True, ignore n (use n = index_data or
 # len(index_data) instead)
 #
-# @return: A k by n 2D array composed of k randomly sampled lists of index, each of size n.
-def sample(index_data, n, k = 1, replace = False):
+# @return: A 1 by n numpy array composed of n indices randomly sampled from index_data.
+def sample(index_data, n, replace=False):
     if n <= 0:
         n = len(index_data)
 
-    result = numpy.zeros((k, n))
-    for i in range(k):
-        result[i, 0:n] = numpy.sort(numpy.random.choice(index_data, n, replace))
+    result = numpy.sort(numpy.random.choice(index_data, n, replace))
 
     return result
+
+
+# Generate an ordered set containing the folds of a k cross-validation
+#
+# @param index_data: a list containing the initial full index of the data.
+#
+# @param k: the number of folds for cross validation
+#
+# @return An OrderedDict with key = fold id (int 1 to k) and value = numpy array corresponding to the fold (test set).
+def gen_cv_folds(index_data, k):
+    folds = OrderedDict()
+    n = floor(len(index_data)/k) # number of samples to draw from curr_index
+    curr_index = index_data
+
+    for i in range(k):
+        if i < k - 1: # not generating the last fold
+            folds[i+1] = sample(curr_index, n, replace = False)
+            curr_index = complement(curr_index,folds[i+1]) # set curr_index to the rest of curr_index that hasn't been
+            # chosen
+        else: # generating the last fold
+            folds[i] = numpy.sort(curr_index)
+
+    return curr_index
 
 
 # Generate resampled corpuses using a given fold indices and save them under the directory specified by user.
@@ -33,7 +53,7 @@ def sample(index_data, n, k = 1, replace = False):
 #
 # @param full_config: full configuration file in an OrderedDict
 #
-# @param folds: A k x n 2D numpy array containing indices of the documents inside each fold.
+# @param folds: An OrderedDict containing numpy arrays of indices of the documents inside each fold.
 def gen_folds(config_path, folds):
     # Parse original config
     orig_config = parse_config(config_path)
@@ -43,10 +63,11 @@ def gen_folds(config_path, folds):
     corpus = read_corpus(orig_corpus_path)
 
     full_index = range(len(corpus)) # list containing the full index of the corpus
-    (k, n) = folds.shape
-    for i in range(k):
+
+    for i in folds.keys():
         # Generate each inFold corpus and outFold corpus
-        infold_index = folds[i,:]
+        # Definition: inFold is the test set, outFold is the training set.
+        infold_index = folds[i]
         outfold_index = complement(full_index, infold_index)
         infold_corpus = corpus[infold_index]
         outfold_corpus = corpus[outfold_index]
@@ -60,7 +81,7 @@ def gen_folds(config_path, folds):
         full_qrel_path = orig_config['query-judgements'] # path to the original query judgment
         qrel_mapper(full_qrel_path, infold_index, infold_dirpath)
         qrel_mapper(full_qrel_path, outfold_index, outfold_dirpath)
-        # TODO: config generation - config to be saved under orig_data_dir/fold_i/
+        # Config generation - config to be saved under orig_data_dir/fold_i/
         stopwords_path = os.path.abspath(orig_config['stop-words'])  # abs path for stopwords file
         # in-fold (training) config
         in_config = orig_config
