@@ -37,14 +37,14 @@ def gen_cv_folds(index_data, k):
     curr_index = index_data
 
     for i in range(k):
-        if i < k - 1: # not generating the last fold
+        if i != k - 1: # not generating the last fold
             folds[i+1] = sample(curr_index, n, replace = False)
-            curr_index = complement(curr_index,folds[i+1]) # set curr_index to the rest of curr_index that hasn't been
-            # chosen
+            curr_index = complement(curr_index,folds[i+1]) # set curr_index to the rest of curr_index that hasn't
+            # been chosen
         else: # generating the last fold
-            folds[i] = numpy.sort(curr_index)
+            folds[i+1] = numpy.sort(curr_index)
 
-    return curr_index
+    return folds
 
 
 # Generate resampled corpuses using a given fold indices and save them under the directory specified by user.

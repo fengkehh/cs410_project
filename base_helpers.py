@@ -14,13 +14,13 @@ def file_open(fullpath, mode):
     return open(fullpath, mode)
 
 
-# Helper function. Given a full 1D list or array and a subset of said list, return the complement.
+# Helper function. Given a full 1D list or array and a subset of said list, return the complement in a list.
 def complement(full, sub):
-    # Convert to sets first. TODO: might need to use ordered set!
+    # Convert to sets first.
     fullset = set(full)
     subset = set(sub)
 
-    return fullset - subset
+    return list(fullset - subset)
 
 
 # Helper function. Read corpus into a numpy array of strings from a user supplied filepath.
