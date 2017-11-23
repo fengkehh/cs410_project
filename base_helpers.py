@@ -1,15 +1,15 @@
 import numpy
 from collections import OrderedDict
-from os import *
+import os
 
 
 # Helper function. Given a fullpath and mode, open this file for read or write. If it's write mode and directory doesn't
 # exist, create it. Return the opened file.
 def file_open(fullpath, mode):
-    dirpath = path.dirname(fullpath)
+    dirpath = os.path.dirname(fullpath)
     if mode.find('w') >= 0: # write mode
-        if not path.exists(dirpath): # directory doesn't exist, create.
-            makedirs(dirpath)
+        if not os.path.exists(dirpath): # directory doesn't exist, create.
+            os.makedirs(dirpath)
 
     return open(fullpath, mode)
 
@@ -98,6 +98,22 @@ def dict_insert(container, key, value):
         container[key] = container[key].append(value)
 
 
+# Helper function: return value associated with given key from the OrderedDict config.
+# Normally returns a string (with " stripped from front and end). If key is not found in config, return -1.
+def config_getval(config, key):
+    if key in config.keys():
+        return config[key].strip('"')
+    else:
+        return -1
+
+
+# Helper function: set value associated with given key to the OrderedDict config.
+def config_setval(config, key, val):
+    value = '"' + val + '"'
+    config[key] = value
+
+
+# TODO: Something is wrong with qrel_mapper. Need to debug this.
 # Helper function. Given a full path to a query relevance file, a 1D array of sorted document indices and a
 # path to a directory, save the resampled and reordered docIDs in a new query relevance file in the directory. Save the
 # query docID mapping in the format of "original,new" (minus the quotes) in a mapping file in the directory.
