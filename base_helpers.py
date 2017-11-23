@@ -1,6 +1,4 @@
-import numpy
-from collections import OrderedDict
-import os
+import numpy, pytoml, os.path, collections
 
 
 # Helper function. Given a fullpath and mode, open this file for read or write. If it's write mode and directory doesn't
@@ -50,43 +48,22 @@ def write_corpus(strings, fullpath):
     corpus.close()
 
 
-# Helper function. Given a full path to a toml config file, parse settings and store them in an OrderedDict.
+# Helper function. Given a full path to a toml config file, parse settings and store them in a dict. Now using
+# pytoml library.
 def parse_config(fullpath):
-    result = OrderedDict()
-    config = file_open(fullpath, 'r')
-    line = config.readline()
-    while line:
-        tokens = line.split('=')
-
-        if len(tokens) > 1:
-            result[tokens[0].strip()] = tokens[1].strip()
-        else: # this is a config header line (no value)
-            result[tokens[0].strip()] = ''
-
-        line = config.readline()
-
-    config.close()
+    fid = file_open(fullpath, 'r')
+    result = pytoml.load(fid)
+    fid.close()
 
     return result
 
 
-# Helper function. Given an OrderedDict with keys = config keys, values = config settings, write to a toml config file
-# as specified by the user.
+# Helper function.  Given a dict configs with keys = config keys, values = config settings, write to a toml config file
+# as specified by the user. Now using pytoml library.
 def write_config(configs, fullpath):
-    file = file_open(fullpath, 'w')
-
-    for key in configs.keys():
-        setting = configs[key]
-        line = key
-
-        if setting: # empty setting means it's a config section header
-            line = line + ' = ' + setting + '\n'
-        else:
-            line = line + '\n'
-
-        file.write(line)
-
-    file.close()
+    fid = file_open(fullpath, 'w')
+    string = pytoml.dump(configs, fid)
+    fid.close()
 
 
 # Helper function. Insert a key to a dict or OrderedDict and set value in a list. If key already exists, append value
@@ -95,7 +72,7 @@ def dict_insert(container, key, value):
     if key not in container:
         container[key] = [value]
     else:
-        container[key] = container[key].append(value)
+        container[key].append(value)
 
 
 # Helper function: return value associated with given key from the OrderedDict config.
@@ -113,7 +90,6 @@ def config_setval(config, key, val):
     config[key] = value
 
 
-# TODO: Something is wrong with qrel_mapper. Need to debug this.
 # Helper function. Given a full path to a query relevance file, a 1D array of sorted document indices and a
 # path to a directory, save the resampled and reordered docIDs in a new query relevance file in the directory. Save the
 # query docID mapping in the format of "original,new" (minus the quotes) in a mapping file in the directory.
@@ -124,7 +100,7 @@ def qrel_mapper(qrel_path, fold, targetdir):
     orig_rel = dict()
     qrel_line = qrel.readline()
 
-    while not qrel_line:
+    while qrel_line:
         tokens = qrel_line.split()
         # Format: key = original docID, value = list [tuple (qID, relevance)]
         dict_insert(orig_rel,key=tokens[1], value=(tokens[0],tokens[2]))
@@ -139,15 +115,18 @@ def qrel_mapper(qrel_path, fold, targetdir):
     temp = dict()
 
     for i in range(len(fold)):
-        docID_orig = fold[i]
-        qmap_line = str(docID_orig) + ',' + str(i) + '\n'
+        docID_orig = str(fold[i])
+        qmap_line = docID_orig + ',' + str(i) + '\n'
         qmap.write(qmap_line)
         # Also put relevance into temp storage for resampled docs. Format: key = qID,
         # value = list of [tuple (new docID, rel)]
-        doc_rel = orig_rel[docID_orig]
 
-        for tuple in doc_rel:
-            dict_insert(temp,key=tuple[0],value=(str(i),tuple[1]))
+        if docID_orig in orig_rel.keys(): # current doc in the fold has associated relevance judgment(s)
+            doc_rel = orig_rel[docID_orig]
+            for tuple in doc_rel: # process all relevance judgments for it
+                dict_insert(temp, key=tuple[0], value=(str(i), tuple[1]))
+        else: # current doc in the fold doesn't have relevance judgment
+            continue
 
     qmap.close()
 
@@ -156,10 +135,8 @@ def qrel_mapper(qrel_path, fold, targetdir):
     sorted_qids = sorted(temp.keys())
 
     for qID in sorted_qids:
-        rsamp_line = qID
-
         for tuple in temp[qID]:
-            rsamp_line = rsamp_line + ' ' + tuple[0] + ' ' + tuple[1] + '\n'
-        qrels_samp.write(rsamp_line)
+            rsamp_line = qID + ' ' + tuple[0] + ' ' + tuple[1] + '\n'
+            qrels_samp.write(rsamp_line)
 
     qrels_samp.close()
