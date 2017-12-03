@@ -1,0 +1,17 @@
+Looks like:
+
+1. prefix should be set to directory containing config file
+
+2. dataset should be just name of the subfolder (of the folder that contains config) with the .dat
+
+3. corpus = line.toml should be kept in the same folder with .dat
+
+4. stop-words has to be the full abs path or full relative path to the stopwords file.
+
+5. query-judgements has to be the full abs path or the full relative path to the query-rels file
+
+6. query-path should be just name of the queries text. queries.txt should be stored with .dat
+
+7. index?? what does it do?
+
+

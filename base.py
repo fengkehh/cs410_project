@@ -31,7 +31,7 @@ def sample(index_data, n, replace=False):
 # @param k: the number of folds for cross validation
 #
 # @return An OrderedDict with key = fold id (int 1 to k) and value = numpy array corresponding to the fold (test set).
-def gen_cv_folds(index_data, k):
+def gen_cv_testfolds(index_data, k):
     folds = collections.OrderedDict()
     n = floor(len(index_data)/k) # number of samples to draw from curr_index
     curr_index = index_data
@@ -45,6 +45,21 @@ def gen_cv_folds(index_data, k):
             folds[i+1] = numpy.sort(curr_index)
 
     return folds
+
+
+# This function generate the training folds for CV.
+def gen_cv_trainfolds(index_data, k):
+    infolds = gen_cv_testfolds(index_data, k)
+    outfolds = collections.OrderedDict()
+
+    for i in infolds.keys():
+        outfolds[i] = complement(index_data, infolds)
+
+    return outfolds
+
+
+def gen_boot_trainfolds(index_data, k):
+    return
 
 
 # Generate resampled corpuses using a given fold indices and save them under the directory specified by user.
