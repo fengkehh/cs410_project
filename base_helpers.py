@@ -1,4 +1,4 @@
-import numpy, pytoml, os.path, collections
+import numpy, pytoml, os.path
 
 
 # Helper function. Given a fullpath and mode, open this file for read or write. If it's write mode and directory doesn't
@@ -90,6 +90,7 @@ def config_setval(config, key, val):
     config[key] = value
 
 
+# TODO: Something is wrong with qrel_mapper. Need to debug this.
 # Helper function. Given a full path to a query relevance file, a 1D array of sorted document indices and a
 # path to a directory, save the resampled and reordered docIDs in a new query relevance file in the directory. Save the
 # query docID mapping in the format of "original,new" (minus the quotes) in a mapping file in the directory.

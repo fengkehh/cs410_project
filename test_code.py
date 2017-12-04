@@ -1,6 +1,5 @@
 import metapy
 from base import *
-from math import floor
 
 fidx = metapy.index.make_forward_index('./cranfield_config.toml')
 index = fidx.docs()

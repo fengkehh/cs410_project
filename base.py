@@ -24,42 +24,42 @@ def sample(index_data, n, replace=False):
     return result
 
 
-# Generate an ordered set containing the folds of a k cross-validation
+# Generate an ordered set containing the training folds of a k cross-validation
 #
-# @param index_data: a list containing the initial full index of the data. Design decision: first index is 1!
+# @param index_data: a list containing the initial full index of the data. Design decision: first fold index is 1!
 #
 # @param k: the number of folds for cross validation
 #
-# @return An OrderedDict with key = fold id (int 1 to k) and value = numpy array corresponding to the fold (test set).
-def gen_cv_testfolds(index_data, k):
-    folds = collections.OrderedDict()
+# @return An dict with key = fold id (int 1 to k) and value = numpy array corresponding to the fold (test set).
+def gen_cv_folds(index_data, k):
+    folds = dict()
     n = floor(len(index_data)/k) # number of samples to draw from curr_index
     curr_index = index_data
 
     for i in range(k):
         if i != k - 1: # not generating the last fold
-            folds[i+1] = sample(curr_index, n, replace = False)
-            curr_index = complement(curr_index,folds[i+1]) # set curr_index to the rest of curr_index that hasn't
+            test_fold = sample(curr_index, n, replace = False)
+            curr_index = complement(curr_index, test_fold) # set curr_index to the rest of curr_index that hasn't
             # been chosen
         else: # generating the last fold
-            folds[i+1] = numpy.sort(curr_index)
+            test_fold = curr_index
+
+        # training fold is elements not picked by sample().
+        folds[i + 1] = complement(index_data, test_fold)
 
     return folds
 
 
-# This function generate the training folds for CV.
-def gen_cv_trainfolds(index_data, k):
-    infolds = gen_cv_testfolds(index_data, k)
-    outfolds = collections.OrderedDict()
+# Generate an ordered set containing the training folds of a bootstrap.
+def gen_boot_folds(index_data, k):
+    folds = dict()
+    n = len(index_data)
 
-    for i in infolds.keys():
-        outfolds[i] = complement(index_data, infolds)
+    # pick bootstramp training fold directly using sample().
+    for i in range(k):
+        folds[i+1] = sample(index_data, n, replace = True)
 
-    return outfolds
-
-
-def gen_boot_trainfolds(index_data, k):
-    return
+    return folds
 
 
 # Generate resampled corpuses using a given fold indices and save them under the directory specified by user.
@@ -68,7 +68,7 @@ def gen_boot_trainfolds(index_data, k):
 #
 # @param full_config: full configuration file in an OrderedDict
 #
-# @param folds: An OrderedDict containing numpy arrays of indices of the documents inside each fold.
+# @param folds: An dict() containing numpy arrays of indices of the documents inside each fold.
 def gen_data_folds(config_path, folds):
     # Parse original config
     orig_config = parse_config(config_path)
@@ -79,7 +79,7 @@ def gen_data_folds(config_path, folds):
 
     full_index = range(len(corpus)) # list containing the full index of the corpus
 
-    for i in folds.keys():
+    for i in range(len(folds.keys)):
         # Generate each inFold corpus and outFold corpus
         # Definition: inFold is the test set, outFold is the training set.
         infold_index = folds[i]
