@@ -79,7 +79,7 @@ def gen_data_folds(config_path, folds):
 
     full_index = range(len(corpus)) # list containing the full index of the corpus
 
-    for i in range(len(folds.keys)):
+    for i in folds:
         # Generate each inFold corpus and outFold corpus
         # Definition: inFold is the test set, outFold is the training set.
         infold_index = folds[i]
