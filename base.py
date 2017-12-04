@@ -24,7 +24,7 @@ def sample(index_data, n, replace=False):
     return result
 
 
-# Generate an ordered set containing the training folds of a k cross-validation
+# Generate a set containing the training folds of a k cross-validation
 #
 # @param index_data: a list containing the initial full index of the data. Design decision: first fold index is 1!
 #
@@ -50,7 +50,7 @@ def gen_cv_folds(index_data, k):
     return folds
 
 
-# Generate an ordered set containing the training folds of a bootstrap.
+# Generate a set containing the training folds of a bootstrap.
 def gen_boot_folds(index_data, k):
     folds = dict()
     n = len(index_data)
@@ -80,35 +80,34 @@ def gen_data_folds(config_path, folds):
     full_index = range(len(corpus)) # list containing the full index of the corpus
 
     for i in folds:
-        # Generate each inFold corpus and outFold corpus
-        # Definition: inFold is the test set, outFold is the training set.
-        infold_index = folds[i]
-        outfold_index = complement(full_index, infold_index)
-        infold_corpus = corpus[infold_index]
-        outfold_corpus = corpus[outfold_index]
+        # Generate each training set corpus and test set corpus
+        trainfold_index = folds[i]
+        testfold_index = complement(full_index, trainfold_index)
+        trainfold_corpus = corpus[trainfold_index]
+        testfold_corpus = corpus[testfold_index]
         # Caching corpuses on disk
         fold_dir = orig_data_dir + 'fold_' + str(i) + '/' # dir path to each fold
-        infold_dirpath = fold_dir + 'in/' # in fold dir path
-        outfold_dirpath = fold_dir + 'out/' # out fold dir path
-        write_corpus(infold_corpus, infold_dirpath + 'in.dat')
-        write_corpus(outfold_corpus, outfold_dirpath + 'out.dat')
+        trainfold_dirpath = fold_dir + 'train/' # train fold dir path
+        testfold_dirpath = fold_dir + 'test/'  # test  fold dir path
+        write_corpus(trainfold_corpus, trainfold_dirpath + 'train.dat')
+        write_corpus(testfold_corpus, testfold_dirpath + 'test.dat')
         # Judgement mapping
         full_qrel_path = orig_config['query-judgements'] # path to the original query judgment
-        qrel_mapper(full_qrel_path, infold_index, infold_dirpath)
-        qrel_mapper(full_qrel_path, outfold_index, outfold_dirpath)
+        qrel_mapper(full_qrel_path, trainfold_index, trainfold_dirpath)
+        qrel_mapper(full_qrel_path, testfold_index, testfold_dirpath)
         # Config generation - config to be saved under orig_data_dir/fold_i/
         stopwords_path = orig_config['stop-words']  # abs path for stopwords file
-        # in-fold (testing) config
-        in_config = orig_config.copy()
-        in_config['prefix'] = fold_dir # config to be saved under "orig_data_dir/fold_i/"
-        in_config['stop-words'] = stopwords_path # setting stopwords file path & name
-        in_config['dataset'] = 'in'
-        in_config['query-judgements'] = infold_dirpath + 'qrels-sampled.txt' # setting judgement file path & name
-        write_config(in_config, fold_dir + 'in_fold.toml') # write configuration file
-        copy2(orig_data_dir + orig_config['query-runner']['query-path'], infold_dirpath) # copy query file over
-        # out-fold (training)
-        out_config = in_config
-        out_config['dataset'] = 'out'
-        out_config['query-judgements'] = outfold_dirpath + 'qrels-sampled.txt'
-        write_config(out_config, fold_dir + 'out_fold.toml')
-        copy2(orig_data_dir + orig_config['query-runner']['query-path'], outfold_dirpath)
+        # test set config
+        test_config = orig_config.copy()
+        test_config['prefix'] = fold_dir # config to be saved under "orig_data_dir/fold_i/"
+        test_config['stop-words'] = stopwords_path # setting stopwords file path & name
+        test_config['dataset'] = 'test'
+        test_config['query-judgements'] = testfold_dirpath + 'qrels-sampled.txt' # setting judgement file path & name
+        write_config(test_config, fold_dir + 'test_fold.toml') # write configuration file
+        copy2(orig_data_dir + orig_config['query-runner']['query-path'], testfold_dirpath) # copy query file over
+        # training set config
+        train_config = test_config
+        train_config['dataset'] = 'train'
+        train_config['query-judgements'] = trainfold_dirpath + 'qrels-sampled.txt'
+        write_config(train_config, fold_dir + 'train_fold.toml')
+        copy2(orig_data_dir + orig_config['query-runner']['query-path'], trainfold_dirpath)
