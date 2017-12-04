@@ -1,0 +1,17 @@
+prefix = "."
+stop-words = "./stopwords.txt"
+
+dataset = "fake_data"
+corpus = "line.toml"
+index = "idx"
+
+query-judgements = "./fake_data/fake_data/fake-qrels.txt"
+
+[[analyzers]]
+method = "ngram-word"
+ngram = 1
+filter = "default-unigram-chain"
+
+[query-runner]
+query-path = "fake-queries.txt"
+query-id-start = 1
