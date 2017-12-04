@@ -29,7 +29,7 @@ def read_corpus(fullpath):
     temp = []
 
     while line:
-        temp.append(line)
+        temp.append(line.strip("\n"))
         line = corpus.readline()
 
     # Convert to numpy array to allow list index access.
@@ -42,8 +42,10 @@ def read_corpus(fullpath):
 # Helper function. Write a list (or numpy array) of strings into a corpus file from a user supplied filepath
 def write_corpus(strings, fullpath):
     corpus = file_open(fullpath, 'w')
-    for string in strings:
-        corpus.write(string)
+    for string in strings[:-1]:
+        corpus.write(string + "\n")
+    else:
+        corpus.write(strings[-1])
 
     corpus.close()
 
