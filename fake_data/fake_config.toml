@@ -1,5 +1,5 @@
-prefix = "."
-stop-words = "./stopwords.txt"
+prefix = "./fake_data"
+stop-words = "./fake_data/stopwords.txt"
 
 dataset = "fake_data"
 corpus = "line.toml"

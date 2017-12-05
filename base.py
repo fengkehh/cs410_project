@@ -1,5 +1,5 @@
 from base_helpers import *
-from shutil import copy2
+from shutil import copy2, rmtree
 from math import floor
 
 
@@ -76,6 +76,10 @@ def gen_data_folds(config_path, folds):
     orig_data_dir = orig_config['prefix'] + '/' + set_name + '/' # dir path to dataset.dat
     orig_corpus_path = orig_data_dir + set_name + '.dat'
     corpus = read_corpus(orig_corpus_path)
+    target_dir = orig_data_dir + 'resampled/'
+    if (os.path.exists(target_dir)):
+        # target directory is dirty. Delete!
+        rmtree(target_dir)
 
     full_index = range(len(corpus)) # list containing the full index of the corpus
 
@@ -86,7 +90,8 @@ def gen_data_folds(config_path, folds):
         trainfold_corpus = corpus[trainfold_index]
         testfold_corpus = corpus[testfold_index]
         # Caching corpuses on disk
-        fold_dir = orig_data_dir + 'fold_' + str(i) + '/' # dir path to each fold
+        fold_dir = target_dir + 'fold_' + str(i) + '/' # dir path to each fold
+
         trainfold_dirpath = fold_dir + 'train/' # train fold dir path
         testfold_dirpath = fold_dir + 'test/'  # test  fold dir path
         write_corpus(trainfold_corpus, trainfold_dirpath + 'train.dat')

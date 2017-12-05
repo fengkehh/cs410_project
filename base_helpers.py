@@ -42,10 +42,11 @@ def read_corpus(fullpath):
 # Helper function. Write a list (or numpy array) of strings into a corpus file from a user supplied filepath
 def write_corpus(strings, fullpath):
     corpus = file_open(fullpath, 'w')
-    for string in strings[:-1]:
-        corpus.write(string + "\n")
-    else:
-        corpus.write(strings[-1])
+    if (len(strings) > 0):
+        for string in strings[:-1]:
+            corpus.write(string + "\n")
+        else:
+            corpus.write(strings[-1])
 
     corpus.close()
 
@@ -114,13 +115,13 @@ def qrel_mapper(qrel_path, fold, targetdir):
     # Write out docID mapping for the query relevance file
     # Format: original,new on each line for docIDs in the sampled fold
     # temp storage for resampled relevance
-    qmap = file_open(targetdir + 'qmap.txt', 'w')
+    dmap = file_open(targetdir + 'doc_map.txt', 'w')
     temp = dict()
 
     for i in range(len(fold)):
         docID_orig = str(fold[i])
-        qmap_line = docID_orig + ',' + str(i) + '\n'
-        qmap.write(qmap_line)
+        dmap_line = docID_orig + ',' + str(i) + '\n'
+        dmap.write(dmap_line)
         # Also put relevance into temp storage for resampled docs. Format: key = qID,
         # value = list of [tuple (new docID, rel)]
 
@@ -131,7 +132,7 @@ def qrel_mapper(qrel_path, fold, targetdir):
         else: # current doc in the fold doesn't have relevance judgment
             continue
 
-    qmap.close()
+    dmap.close()
 
     # Write the sampled qrel file with new docIDs.
     qrels_samp = file_open(targetdir + 'qrels-sampled.txt', 'w')
