@@ -78,19 +78,34 @@ def dict_insert(container, key, value):
         container[key].append(value)
 
 
+# Helper function. Parse query relevance. Return a dictionary of the form {qID: {docID: gain}}
+def qrel_parse(qrel_path):
+    qrel_dict = dict()
+    fid = file_open(qrel_path)
+    line = fid.readline()
+    while line:
+        tokens = line.split()
+        if tokens[0] not in qrel_dict:
+            qrel_dict[tokens[0]] = dict()
+        qrel_dict[tokens[0]][tokens[1]] = tokens[2]
+        line = fid.readline()
+
+    fid.close()
+
+
 # Helper function: return value associated with given key from the OrderedDict config.
 # Normally returns a string (with " stripped from front and end). If key is not found in config, return -1.
-def config_getval(config, key):
-    if key in config.keys():
-        return config[key].strip('"')
-    else:
-        return -1
+# def config_getval(config, key):
+#     if key in config.keys():
+#         return config[key].strip('"')
+#     else:
+#         return -1
 
 
 # Helper function: set value associated with given key to the OrderedDict config.
-def config_setval(config, key, val):
-    value = '"' + val + '"'
-    config[key] = value
+# def config_setval(config, key, val):
+#     value = '"' + val + '"'
+#     config[key] = value
 
 
 # TODO: Something is wrong with qrel_mapper. Need to debug this.
