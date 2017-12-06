@@ -9,7 +9,7 @@ from base_helpers import *
 # @param result_path: string pointing to the file where evaluation result is to be saved
 # @param cutoff: n cutoff default to 10
 # @return
-def predict(test_config_path, train_config_path, queries_path, model_params, result_path, cutoff = 10):
+def evaluate(test_config_path, train_config_path, queries_path, model_params, result_path, cutoff = 10):
     k = model_params['k']
     b = model_params['b']
     # setup analyzers and document container
@@ -69,9 +69,3 @@ def predict(test_config_path, train_config_path, queries_path, model_params, res
         fid.write(str(qID_ndcg) + "\n")
 
     fid.close()
-
-
-# Produce the ndcg per query for all given queries for retrieval of docs in the test set using model trained on the traing set.
-def evaluate(test_config_path, train_config_path, queries, qrels):
-    idx_test = metapy.index.make_inverted_index(test_config_path)
-    idx_train = metapy.index.make_inverted_index(train_config_path)
