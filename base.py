@@ -108,11 +108,15 @@ def gen_data_folds(config_path, folds):
         test_config['stop-words'] = stopwords_path # setting stopwords file path & name
         test_config['dataset'] = 'test'
         test_config['query-judgements'] = testfold_dirpath + 'qrels-sampled.txt' # setting judgement file path & name
+        test_config['index'] = testfold_dirpath + 'idx'
         write_config(test_config, fold_dir + 'test_fold.toml') # write configuration file
         copy2(orig_data_dir + orig_config['query-runner']['query-path'], testfold_dirpath) # copy query file over
+        copy2(orig_data_dir + 'line.toml', testfold_dirpath) # copy over corpus config file
         # training set config
         train_config = test_config
         train_config['dataset'] = 'train'
         train_config['query-judgements'] = trainfold_dirpath + 'qrels-sampled.txt'
+        train_config['index'] = trainfold_dirpath + 'idx'
         write_config(train_config, fold_dir + 'train_fold.toml')
         copy2(orig_data_dir + orig_config['query-runner']['query-path'], trainfold_dirpath)
+        copy2(orig_data_dir + 'line.toml', trainfold_dirpath)  # copy over corpus config file

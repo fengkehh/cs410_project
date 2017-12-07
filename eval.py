@@ -19,7 +19,7 @@ def evaluate(test_config_path, train_config_path, queries_path, model_params, re
 
     # load config
     test_config = parse_config(test_config_path)
-    train_config = parse_config(queries_path)
+    # train_config = parse_config(queries_path)
     # Generate inverted index of both test and training set
     idx_test = metapy.index.make_inverted_index(test_config_path)
     idx_train = metapy.index.make_inverted_index(train_config_path)
@@ -27,7 +27,7 @@ def evaluate(test_config_path, train_config_path, queries_path, model_params, re
     test_corpus = read_corpus(test_config['prefix'] + '/' + test_config['dataset'] + '/' + test_config['dataset'] + '.dat')
     # Parse for queries
     queries = read_corpus(test_config['prefix'] + '/' + test_config['dataset'] + '/' + test_config['query-runner']['query-path'])
-    qrel_path = test_config['query-judgments']
+    qrel_path = test_config['query-judgements']
     # parse the query relevance data
     qrel_dict = qrel_parse(qrel_path)
     # open target file for writing result
@@ -53,19 +53,24 @@ def evaluate(test_config_path, train_config_path, queries_path, model_params, re
 
         doc_scores.sort(key = lambda tup: tup[1], reverse = True)
         # retrieved docs in the format [(doc_ID, ranker score),...]
-        retrieved_docs = doc_scores[0:cutoff]
+        retrieved_docs_scores = doc_scores[0:cutoff]
+        retrieved_docs_gains = []
         # Determine the gain from query relevance file
-        for ind in range(len(retrieved_docs)):
-            # change ranker score to gain
-            if retrieved_docs[ind][1] in qrel_dict[qID]:
+        for ind in range(len(retrieved_docs_scores)):
+            # stored qID in the relevance file may not start at 0!
+            qID = qID + test_config['query-runner']['query-id-start']
+            gain_val = 0
+            # find doc gain
+            docID = retrieved_docs_scores[ind][0]
+            if docID in qrel_dict[qID]:
                 # qrel lookup table contains an entry for the current query for the current docID
-                retrieved_docs[ind][1] = qrel_dict[qID][retrieved_docs[ind][0]]
-            else:
-                # document is completely irrelevant. set gain to 0
-                retrieved_docs[ind][1] = 0
+                #retrieved_docs[ind][1] = qrel_dict[qID][retrieved_docs[ind][0]]
+                gain_val = qrel_dict[qID][docID]
+
+            retrieved_docs_gains.append((docID, gain_val))
 
         # Compute nDCG for this qID and list of retrieved documents. Write to disk.
-        qID_ndcg = ndcg(qID, retrieved_docs, qrel_dict)
+        qID_ndcg = ndcg(qID, retrieved_docs_gains, qrel_dict)
         fid.write(str(qID_ndcg) + "\n")
 
     fid.close()

@@ -52,16 +52,17 @@ def BM25_score(document, analyzed_query, idx_test, idx_train, k, b):
 def ndcg_helper(list_gains):
     # compute numerator
     sum = 0
-    for i in range(len(list_gains)):
-        if i == 0:
-            sum += list_gains[i]
+    for i in range(1, len(list_gains) + 1):
+        # i = index + 1
+        if i == 1:
+            sum += list_gains[i-1]
         else:
-            sum += list_gains[i]/math.log(i,2)
+            sum += list_gains[i-1]/math.log(i,2)
 
     return sum
 
 
-# qID: query ID in the test set relevance file
+# qID: query ID as it appears in the test set relevance file
 # retrieved_docs: list of tuples in the form [(docID, gain),...] in the order of retrieved rank (top to bottom) for the current qID.
 # qrel_dict: dictionary containing all query relevance information from the test set in the format {qID: {docID: gain}}
 # NDCG is cutoff at len(retrieved_docIDs)

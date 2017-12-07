@@ -81,16 +81,20 @@ def dict_insert(container, key, value):
 # Helper function. Parse query relevance. Return a dictionary of the form {qID: {docID: gain}}
 def qrel_parse(qrel_path):
     qrel_dict = dict()
-    fid = file_open(qrel_path)
+    fid = file_open(qrel_path, 'r')
     line = fid.readline()
     while line:
         tokens = line.split()
-        if tokens[0] not in qrel_dict:
-            qrel_dict[tokens[0]] = dict()
-        qrel_dict[tokens[0]][tokens[1]] = tokens[2]
+        qID = int(tokens[0])
+        docID = int(tokens[1])
+        gain = int(tokens[2])
+        if qID not in qrel_dict:
+            qrel_dict[qID] = dict()
+        qrel_dict[qID][docID] = gain
         line = fid.readline()
 
     fid.close()
+    return qrel_dict
 
 
 # Helper function: return value associated with given key from the OrderedDict config.

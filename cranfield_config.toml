@@ -3,7 +3,7 @@ stop-words = "./stopwords.txt"
 
 dataset = "cranfield"
 corpus = "line.toml"
-index = "idx"
+index = "./cranfield/idx"
 
 query-judgements = "./cranfield/cranfield-qrels.txt"
 
