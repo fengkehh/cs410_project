@@ -33,8 +33,13 @@ def evaluate(test_config_path, train_config_path, model_params, result_path, cut
         qrel_path = test_config['query-judgements']
     else:
         # test set is splitted from a full set. Full relevance is provided by user through qrel_path
-        # must read doc_map.txt and generate docID mapper
-        dmap = parse_dmap(test_config['prefix'] + test_config['dataset'] + '/doc_map.txt')
+        if qrel_path:
+            # must read doc_map.txt and generate docID mapper
+            dmap = parse_dmap(test_config['prefix'] + test_config['dataset'] + '/doc_map.txt')
+        else:
+            # User didn't provide full relevance file. Complain and quit!
+            print('Test set was split from a full set. Must provide path to full relevance file!')
+            return
 
     # parse the query relevance data
     qrel_dict = qrel_parse(qrel_path)
