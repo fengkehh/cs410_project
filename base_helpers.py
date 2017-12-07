@@ -29,7 +29,9 @@ def read_corpus(fullpath):
     temp = []
 
     while line:
-        temp.append(line.strip("\n"))
+        line = line.strip('\n')
+        #if line: # skip any lines that are just the new line
+        temp.append(line)
         line = corpus.readline()
 
     # Convert to numpy array to allow list index access.
@@ -112,7 +114,6 @@ def qrel_parse(qrel_path):
 #     config[key] = value
 
 
-# TODO: Something is wrong with qrel_mapper. Need to debug this.
 # Helper function. Given a full path to a query relevance file, a 1D array of sorted document indices and a
 # path to a directory, save the resampled and reordered docIDs in a new query relevance file in the directory. Save the
 # query docID mapping in the format of "original,new" (minus the quotes) in a mapping file in the directory.
@@ -132,14 +133,16 @@ def qrel_mapper(qrel_path, fold, targetdir):
     qrel.close()
 
     # Write out docID mapping for the query relevance file
-    # Format: original,new on each line for docIDs in the sampled fold
+    # Format:
+    # new_docID old_docID
+    # on each line for docIDs in the sampled fold
     # temp storage for resampled relevance
     dmap = file_open(targetdir + 'doc_map.txt', 'w')
     temp = dict()
 
     for i in range(len(fold)):
         docID_orig = str(fold[i])
-        dmap_line = docID_orig + ',' + str(i) + '\n'
+        dmap_line = str(i) + ' ' + docID_orig + '\n'
         dmap.write(dmap_line)
         # Also put relevance into temp storage for resampled docs. Format: key = qID,
         # value = list of [tuple (new docID, rel)]
@@ -163,3 +166,18 @@ def qrel_mapper(qrel_path, fold, targetdir):
             qrels_samp.write(rsamp_line)
 
     qrels_samp.close()
+
+
+# Parse a dmap file to generate a dmap dictionary in the form {new_docID: old_docID}.
+def parse_dmap(dmap_path):
+    dmap = dict()
+    fid = file_open(dmap_path, 'r')
+    line = fid.readline()
+    while line:
+        tokens = line.split()
+        dmap[int(tokens[0])] = int(tokens[1])
+        line = fid.readline()
+
+    fid.close()
+
+    return dmap

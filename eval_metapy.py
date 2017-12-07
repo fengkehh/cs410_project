@@ -32,7 +32,6 @@ def BM25_score(document, analyzed_query, idx_test, idx_train, k, b):
 
         # Term count for the query
         c_w_q = analyzed_query[term]
-        print(term + " freq in query = " + str(c_w_q))
         # Term id in the test set containing the document
         term_id_test = idx_test.get_term_id(term)
         # Term id in the training set
@@ -42,7 +41,6 @@ def BM25_score(document, analyzed_query, idx_test, idx_train, k, b):
         # Compute average document length in the training set after adding current doc to it.
         avdl = (idx_train.avg_doc_length()*idx_train.num_docs() + doc_length)/(idx_train.num_docs() + 1)
         c_w_d = idx_test.term_freq(term_id_test, doc_id_test)
-        print(term + " freq in doc = " + str(c_w_d))
         rank_score += c_w_q*c_w_d*(k+1)/(c_w_d + k*(1 - b + b*doc_length/avdl))*idf(term_id_train,idx_train)
 
     return rank_score
@@ -62,11 +60,13 @@ def ndcg_helper(list_gains):
     return sum
 
 
-# qID: query ID as it appears in the test set relevance file
+# qID: query ID
 # retrieved_docs: list of tuples in the form [(docID, gain),...] in the order of retrieved rank (top to bottom) for the current qID.
 # qrel_dict: dictionary containing all query relevance information from the test set in the format {qID: {docID: gain}}
 # NDCG is cutoff at len(retrieved_docIDs)
 def ndcg(qID, retrieved_docs, qrel_dict):
+    if qID == 226:
+        print('wtf')
     # Parse the query relevance file and compute the max DCG.
     all_gains = []
     n = len(retrieved_docs) # cutoff number
