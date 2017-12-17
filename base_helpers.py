@@ -1,4 +1,10 @@
-import numpy, pytoml, os.path
+import pytoml, os.path
+
+
+# Helper function. Given a data array and an array of index, return an array pointed to by the index
+def get_by_index(data_array, ind_array):
+    result = [data_array[i] for i in ind_array]
+    return result
 
 
 # Helper function. Given a fullpath and mode, open this file for read or write. If it's write mode and directory doesn't
@@ -26,20 +32,18 @@ def read_corpus(fullpath):
     corpus = file_open(fullpath, 'r')
     line = corpus.readline()
     # Store into regular list first to take advantage of dynamic resizing.
-    temp = []
+    result = []
 
     while line:
         line = line.strip('\n')
         #if line: # skip any lines that are just the new line
-        temp.append(line)
+        result.append(line)
         line = corpus.readline()
 
     # Convert to numpy array to allow list index access.
-    result = numpy.array(temp)
+    # result = numpy.array(temp)
     corpus.close()
-
     return result
-
 
 # Helper function. Write a list (or numpy array) of strings into a corpus file from a user supplied filepath
 def write_corpus(strings, fullpath):
@@ -112,6 +116,21 @@ def qrel_parse(qrel_path):
 # def config_setval(config, key, val):
 #     value = '"' + val + '"'
 #     config[key] = value
+
+
+# Generate doc_ID map in the format "new_id old_id". old_index are the old doc IDs, new_index are the new ones. Both lists have to be the same size.
+def doc_mapper(target_path, old_index, new_index):
+    fid = file_open(target_path, 'w')
+    ind = 0
+    n = len(old_index)
+    while ind != n:
+        line = str(new_index[ind]) + ' ' + str(old_index[ind])
+        if ind < n-1:
+            fid.write(line + '\n')
+        else:
+            fid.write(line)
+        ind += 1
+    fid.close()
 
 
 # Helper function. Given a full path to a query relevance file, a 1D array of sorted document indices and a

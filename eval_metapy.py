@@ -65,8 +65,6 @@ def ndcg_helper(list_gains):
 # qrel_dict: dictionary containing all query relevance information from the test set in the format {qID: {docID: gain}}
 # NDCG is cutoff at len(retrieved_docIDs)
 def ndcg(qID, retrieved_docs, qrel_dict):
-    if qID == 226:
-        print('wtf')
     # Parse the query relevance file and compute the max DCG.
     all_gains = []
     n = len(retrieved_docs) # cutoff number
