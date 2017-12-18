@@ -1,4 +1,4 @@
-import pytoml, os.path
+import pytoml, os
 
 
 # Helper function. Given a data array and an array of index, return an array pointed to by the index
@@ -14,17 +14,18 @@ def file_open(fullpath, mode):
     if mode.find('w') >= 0: # write mode
         if not os.path.exists(dirpath): # directory doesn't exist, create.
             os.makedirs(dirpath)
+        return open(fullpath, mode, buffering=1) # use line buffering to write.
 
     return open(fullpath, mode)
 
 
-# Helper function. Given a full 1D list or array and a subset of said list, return the complement in a list.
+# Helper function. Given a full 1D list or array and a subset of said list, return the complement in a sorted list.
 def complement(full, sub):
     # Convert to sets first.
     fullset = set(full)
     subset = set(sub)
 
-    return list(fullset - subset)
+    return sorted(list(fullset - subset))
 
 
 # Helper function. Read corpus into a numpy array of strings from a user supplied filepath.
@@ -161,7 +162,9 @@ def qrel_mapper(qrel_path, fold, targetdir):
 
     for i in range(len(fold)):
         docID_orig = str(fold[i])
-        dmap_line = str(i) + ' ' + docID_orig + '\n'
+        dmap_line = str(i) + ' ' + docID_orig
+        if i < len(fold)-1:
+            dmap_line += '\n'
         dmap.write(dmap_line)
         # Also put relevance into temp storage for resampled docs. Format: key = qID,
         # value = list of [tuple (new docID, rel)]
@@ -180,9 +183,16 @@ def qrel_mapper(qrel_path, fold, targetdir):
     sorted_qids = sorted(temp.keys())
 
     for qID in sorted_qids:
-        for tuple in temp[qID]:
-            rsamp_line = qID + ' ' + tuple[0] + ' ' + tuple[1] + '\n'
+        n = len(temp[qID])
+        ind = 0
+        for ind in range(n):
+        # for tuple in temp[qID]:
+            tuple = temp[qID][ind]
+            rsamp_line = qID + ' ' + tuple[0] + ' ' + tuple[1]
+            if ind < n-1:
+                rsamp_line += '\n'
             qrels_samp.write(rsamp_line)
+            ind += 1
 
     qrels_samp.close()
 

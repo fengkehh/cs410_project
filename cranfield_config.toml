@@ -5,7 +5,7 @@ dataset = "cranfield"
 corpus = "line.toml"
 index = "./cranfield/idx"
 
-query-judgements = "./cranfield/cranfield-qrels.txt"
+query-judgments = "./cranfield/cranfield-qrels.txt"
 
 [[analyzers]]
 method = "ngram-word"

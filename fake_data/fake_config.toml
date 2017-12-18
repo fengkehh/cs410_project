@@ -5,7 +5,7 @@ dataset = "fake_data"
 corpus = "line.toml"
 index = "idx"
 
-query-judgements = "./fake_data/fake_data/fake-qrels.txt"
+query-judgments = "./fake_data/fake_data/fake-qrels.txt"
 
 [[analyzers]]
 method = "ngram-word"

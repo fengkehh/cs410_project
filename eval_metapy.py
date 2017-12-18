@@ -61,20 +61,29 @@ def ndcg_helper(list_gains):
 
 
 # qID: query ID
-# retrieved_docs: list of tuples in the form [(docID, gain),...] in the order of retrieved rank (top to bottom) for the current qID.
+# retrieved_docs: list of tuples in the form [(docID, gain),...] in the order of retrieved rank (top to bottom) for the
+# current qID. Note that docID here corresponds to the original docID if dataset is split from a larger set.
 # qrel_dict: dictionary containing all query relevance information from the test set in the format {qID: {docID: gain}}
+# all_docIDs: all the (original) docIDs included in the test set
 # NDCG is cutoff at len(retrieved_docIDs)
-def ndcg(qID, retrieved_docs, qrel_dict):
-    # Parse the query relevance file and compute the max DCG.
-    all_gains = []
-    n = len(retrieved_docs) # cutoff number
-    for docID in qrel_dict[qID]:
-        all_gains.append(qrel_dict[qID][docID])
+def ndcg(qID, retrieved_docs, qrel_dict, all_docIDs):
+    result = 0
+    if qID in qrel_dict: # qrel_dict contains relevance information about this query
+        # Parse the query relevance file and compute the max DCG.
+        all_gains = []
+        n = len(retrieved_docs) # cutoff number
+        for docID in all_docIDs:
+            if docID in qrel_dict[qID]:
+                all_gains.append(qrel_dict[qID][docID])
 
-    # Compute max DCG
-    all_gains.sort(reverse=True)
-    denom = ndcg_helper(all_gains[0:n])
-    retrieved_gains = [tuple[1] for tuple in retrieved_docs]
-    numerator = ndcg_helper(retrieved_gains)
+        # Compute max DCG
+        all_gains.sort(reverse=True)
+        denom = ndcg_helper(all_gains[0:n])
+        retrieved_gains = [tuple[1] for tuple in retrieved_docs]
+        numerator = ndcg_helper(retrieved_gains)
 
-    return numerator/denom
+        if denom > 0:
+            result = numerator/denom
+
+    return result
+
