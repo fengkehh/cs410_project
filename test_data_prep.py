@@ -1,11 +1,8 @@
 from base import *
-from glob import glob
-from eval import evaluate
-from operator import add
 import metapy
 
 # Number of desired training sets
-k = 10
+k = 5
 
 # Original set config
 config_path = './apnews/apnews_config.toml'
