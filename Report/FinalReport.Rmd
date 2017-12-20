@@ -83,7 +83,7 @@ The test layer provides template codes to demonstrate a common use case with cro
 
 # Testing Methodology
 
-A large corpus [apnews](https://uofi.box.com/s/5t5tzn5grh9gx4cocp7a5jh3hv9s6cvd) containing 164464 documents is split into two disjoint sets. One of the set (fold_1) is further split into five disjoint sets to represent five different training sets. This can be found in `test_data_prep.py`.
+A large corpus [apnews](https://uofi.box.com/s/5t5tzn5grh9gx4cocp7a5jh3hv9s6cvd) containing 164464 documents is split into two disjoint sets. One of the set (fold_1) is further split into five disjoint sets to represent five different training sets. This can be found in `test_data_prep.py`. Some modifications to the config files are necessary. As such some of the files are included in the repository for reproducibility.
 
 A suite of different evaluations are then carried out on these five sets:
 
@@ -130,6 +130,8 @@ A document-domain resampling framework is implemented in Python. While the desig
 2. Kohavi, R., A Study of Cross-Validation and Bootstrap for Accuracy Estimation and Model Selection, International Joint Conference on Artificial Intelligence (IJCAI), 1995
 
 # Appendix
+
+This is a reproducible report. All codes for data analysis and plot production are available for audit in the repository and can be run to regenerate the report.
 
 \FloatBarrier
 
