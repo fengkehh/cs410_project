@@ -101,7 +101,7 @@ Figure \@ref(fig:meandiff) shows the arithmetic mean NDCG computed with differen
 
 2. There is a hidden bottleneck that is causing consistent overestimation in prediction error from the resampled folds and to a much lesser extent, the complete training set. 
 
-While cross-validation and resampling methods in general indeed tend to overestimate model error[[2](#ref)], the bottleneck is different in the sense that it manifests itself even using reported training error. Thus it is likely not directly connected to the use of resampling methods but the side-effect of an unforeseen complication. The NDCG per query is analyzed to pin-point the culprit. A proportionality quantity is computed from the number of relevant documents contained in the test fold used for evaluation divided by 10 (to a maximum of 1). This quantity shall be refered to as Pro10 from this point on. Since the NDCG in this study is computed with a constant cutoff at 10, Pro10 roughly represents the maximum NDCG a query can possibly obtain from using the specified performance estimator (training or CV) and a perfect retrieval model. If Pro10 is low, then max NDCG is bottlenecked at a low value and the end result will likely deviate from the NDCG computed from the much larger test set due to the lack of relevant documents included in the test fold rather than actual model performance. 
+While cross-validation and resampling methods in general indeed tend to overestimate model error[[2](#ref)], the bottleneck is different in the sense that it manifests itself even using reported training error. Thus it is likely not directly connected to the use of resampling methods but the side-effect of an unforeseen complication. The NDCG per query is analyzed to pin-point the culprit. A proportionality quantity is computed from the number of relevant documents contained in the test fold used for evaluation divided by 10 (to a maximum of 1). This quantity shall be refered to as Pro10 from this point on. Since the NDCG in this study is computed with a constant cutoff at 10, Pro10 roughly represents the maximum NDCG a query can possibly obtain from using the specified performance estimator (training or CV) and a perfect retrieval model. If Pro10 is low, then possible NDCG values become less fine grained and the final result stands a higher chance to deviate from the NDCG computed from the much larger test set due to the lack of relevant documents included in the test fold rather than actual model performance. If there are no relevant document in the test fold (Pro10 is 0), then the NDCG value will likely be underestimated since the larger test set can still contain relevant documents.
 
 Figure \@ref(fig:regBM25train), Figure \@ref(fig:regBM25cv), Figure \@ref(fig:gsBM25train) and Figure \@ref(fig:gsBM25cv) show the difference between test set NDCG and training/CV NDCG per query for each of the five training set. The data points are color-coded using Pro10 for each query. It is clear that
 
@@ -111,7 +111,7 @@ Figure \@ref(fig:regBM25train), Figure \@ref(fig:regBM25cv), Figure \@ref(fig:gs
 
 With this in mind it is likely the culprit for the unepxectedly large negative bias from cross validation and strangely high true model performance with grid-search is the dramatic size difference between the test corpus compared to each of the training set and resampled fold. With a total of 164464 documents, the test corpus contains roughly 80000 documents. In contrast, each of the five training set only contains about 16000 documents, while each of the test folds during cross-validation contains only 3200 documents. It is therefore very likely for model performance on any test folds to become severely bottlenecked due to the lack of documents that are judged to be relevant in the test folds.
 
-It may be possible to combat this phenomenon with the use of stratified sampling during data split and dynamic cutoff resizing. The key is to ensure that the resampled test folds contain roughly same amount of relevant documents for each query proportionally and NDCG cutoff value is shrunk accordingly to the inevitably reduced number of relevant documents after resampling.
+It may be possible to combat this phenomenon with the use of stratified sampling during data split and dynamic weighting if stratification is impossible. The key is to ensure that the resampled test folds contain roughly same amount of relevant documents for each query proportionally to the inevitably reduced number of relevant documents after resampling.
 
 # Conclusion
 
@@ -125,13 +125,11 @@ A document-domain resampling framework is implemented in Python. While the desig
 
 # Reference {#ref}
 
-1.  Järvelin K., Kekäläinen J., Cumulated Gain-Based Evaluation of IR Techniques, ACM Transactions on Information Systems (TOIS): Volume 20 Issue 4, October 2002
+1. Järvelin K., Kekäläinen J., Cumulated Gain-Based Evaluation of IR Techniques, ACM Transactions on Information Systems (TOIS): Volume 20 Issue 4, October 2002
 
 2. Kohavi, R., A Study of Cross-Validation and Bootstrap for Accuracy Estimation and Model Selection, International Joint Conference on Artificial Intelligence (IJCAI), 1995
 
 # Appendix
-
-This is a reproducible report. All codes for data analysis and plot production are available for audit in the repository and can be run to regenerate the report.
 
 \FloatBarrier
 

@@ -37,7 +37,9 @@ The resampling layer is meant to be used as building blocks to construct various
 2. `gen_data_folds(config_path, folds)`: given `config_path`: a path to a configuration file and `folds`: a dictionary with keys 1:k, values = sampled indices to be included in the training folds, carry out test and train splits specified by folds using the data specified by the config file, along with the corresponding data structures and all modified support files.
 
 It is perhaps best to illustrate this using an example. Suppose one wishes to create 2-fold CV folds for the included cranfield set. First we will generate each of the test fold index and find the train fold index to pass along using the sample() and complement() functions. Once all the resampled indices are generated we can translate the indices to actual resampled data using gen_data_folds():
-
+    
+    from base import *
+    
     folds = dict() // fold dictionary
     full_index = range(1400) //cranfield corpus contains 1400 documents
     test_fold = sample(full_index, 700, replace = False) // Generate first test fold
