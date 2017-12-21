@@ -2,8 +2,6 @@
 
 This is a framework meant to support the development and deployment of document-domain resampling in the context of text retrieval and natural language processing.
 
-Required python libraries: pytoml, numpy, pymp. All installable through pip!
-
 A video presentation is also available [here](https://www.youtube.com/watch?v=MfIvKtaTc-k&feature=youtu.be) for those interested.
 
 The framework is organized into three layers:
@@ -27,6 +25,14 @@ In general, a data corpus is expected to have:
  3. A `root/dataset/` sub-folder that contains the actual corpus data files (corpus-format.toml, corpus.dat, query-relevance.txt, queries.txt...etc). 
  
 An example dataset (`./cranfield/`) along with its configuration file is included in the repository. It is recommended to look over the corpus configuration files to see how it is setup.
+
+## Installation
+
+Required python libraries: pytoml, numpy, metapy, pymp. All libraries can be installed through pip. ie:
+
+`pip install pymp`
+
+I recommend installing [Anaconda](https://www.anaconda.com/download/) first and then pytoml and pymp. The framework itself can be used as long as you can import the corresponding source files prior to invoking the framework functions. Due to the use of pymp the framework does NOT work on Windows! Theoretically it should work on OSX but it has not been tested. It is only guaranteed to work on Linux.
 
 ## Resampling Layer
 
