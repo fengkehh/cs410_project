@@ -32,7 +32,7 @@ Required python libraries: pytoml, numpy, metapy, pymp. All libraries can be ins
 
 `pip install pymp`
 
-I recommend installing [Anaconda](https://www.anaconda.com/download/) first and then pytoml and pymp. The framework itself can be used as long as you can import the corresponding source files prior to invoking the framework functions. Due to the use of pymp the framework does NOT work on Windows! Theoretically it should work on OSX but it has not been tested. It is only guaranteed to work on Linux.
+I recommend installing [Anaconda](https://www.anaconda.com/download/) first and then metapy, pytoml and pymp. The framework itself can be used as long as you can import the corresponding source files prior to invoking the framework functions. Due to the use of pymp the framework does NOT work on Windows! Theoretically it should work on OSX but it has not been tested. It is only guaranteed to work on Linux.
 
 ## Resampling Layer
 
