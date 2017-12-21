@@ -2,6 +2,8 @@
 
 This is a framework meant to support the development and deployment of document-domain resampling in the context of text retrieval and natural language processing.
 
+A video presentation is also available [here](https://www.youtube.com/watch?v=MfIvKtaTc-k&feature=youtu.be) for those interested.
+
 The framework is organized into three layers:
 
 1. **Resampling:** tools for data partitioning and generation of support files (config, docID mapping, etc). Core files: `base.py`, `base_helpers.py`.
